@@ -10,7 +10,9 @@ Tested on the following platforms:
 - Ubuntu 10.04.1.
 
 Open for patches to support more systems out of the box! Clone the repo, implement your changes and
-open a pull request.
+submit a pull request. The upstream repo lives here:
+
+https://github.com/atriso/chef-openerp
 
 == Cookbooks:
 
