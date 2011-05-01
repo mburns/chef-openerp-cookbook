@@ -27,9 +27,9 @@ include_recipe "postgresql::client"
 include_recipe "postgresql::server"
 
 # Create the OpenERP database user
-#script "create_openerp_db_user" do
-#  user "postgres"
-#  code <<-EOH
-#  createuser --createdb --username postgres --no-createrole --superuser --pwprompt openerp -e
-#  EOH
-#end
+bash "create_openerp_db_user" do
+  user "postgres"
+  code <<-EOH
+  psql -c "CREATE ROLE #{node[:openerp][:user]} ENCRYPTED PASSWORD '#{node[:openerp][:password]}' SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN;"
+  EOH
+end

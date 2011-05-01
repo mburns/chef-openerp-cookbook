@@ -20,3 +20,4 @@
 default[:openerp][:version] = "6.0.0"
 default[:openerp][:single_node] = "True"
 default[:openerp][:user] = "openerp"
+default[:openerp][:password] = "openerp"
