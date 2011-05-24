@@ -24,7 +24,7 @@
   end
 end
 
-remote_file "#{Chef::Config['file_cache_path']}/openerp-web-6.0.1.tar.gz" do
-  source "http://www.openerp.com/download/stable/source/openerp-web-6.0.1.tar.gz"
+remote_file "#{Chef::Config['file_cache_path']}/openerp-web-#{node[:openerp][:version]}.tar.gz" do
+  source "http://www.openerp.com/download/stable/source/openerp-web-#{node[:openerp][:version]}.tar.gz"
   mode "0644"
 end

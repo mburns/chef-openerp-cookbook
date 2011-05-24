@@ -23,14 +23,25 @@
 #e.run_action(:run)
 
 # Packages needed for the core OpenERP Server
-%w{ python python-lxml python-mako python-egenix-mxdatetime python-dateutil python-psycopg2
-    python-pychart python-pydot python-tz python-reportlab python-yaml python-vobject }.each do |pkg|
+%w{ python python-setuptools python-lxml python-mako python-egenix-mxdatetime python-dateutil
+    python-psycopg2 python-pychart python-pydot python-tz python-reportlab python-yaml
+    python-vobject }.each do |pkg|
   package pkg do
     action :install
   end
 end
 
-remote_file "#{Chef::Config['file_cache_path']}/openerp-server-6.0.1.tar.gz" do
-  source "http://www.openerp.com/download/stable/source/openerp-server-6.0.1.tar.gz"
+remote_file "openerp-server" do
+  path "#{Chef::Config['file_cache_path']}/openerp-server.tar.gz"
+  source "http://www.openerp.com/download/stable/source/openerp-server-#{node[:openerp][:version]}.tar.gz"
   mode "0644"
+end
+
+bash "untar-openerp-server" do
+  code "(cd /tmp; tar zxvf #{Chef::Config['file_cache_path']}/openerp-server.tar.gz)"
+end
+
+execute "install-openerp-server" do
+  cwd "/tmp/openerp-server-#{node[:openerp][:version]}"
+  command "python setup.py install"
 end
