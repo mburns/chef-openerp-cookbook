@@ -34,13 +34,18 @@ include_recipe "postgresql::server"
 #  EOH
 #end
 
-ruby "create_openerp_db_user" do
-  user "postgres"
-  code <<-EOH
-require 'rubygems'
-require 'pg'
-conn = PGconn.connect(nil, 5432, nil, nil, nil, nil, nil)
-conn.exec("CREATE ROLE #{node[:openerp][:user]} ENCRYPTED PASSWORD '#{node[:openerp][:password]}' SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN;")
-conn.finish
-  EOH
+#ruby "create_openerp_db_user" do
+#  user "postgres"
+#  code <<-EOH
+#require 'rubygems'
+#require 'pg'
+#conn = PGconn.connect(nil, 5432, nil, nil, nil, nil, nil)
+#conn.exec("CREATE ROLE #{node[:openerp][:user]} ENCRYPTED PASSWORD '#{node[:openerp][:password]}' SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN;")
+#conn.finish
+#  EOH
+#end
+
+postgresql_role "openerp" do
+  host "127.0.0.1"
+  role "openerp"
 end
