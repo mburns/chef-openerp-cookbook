@@ -47,5 +47,7 @@ include_recipe "postgresql::server"
 
 postgresql_role "openerp" do
   host "127.0.0.1"
+  port 5432
   role "openerp"
+  action :create
 end
