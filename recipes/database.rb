@@ -26,28 +26,13 @@ e.run_action(:run)
 include_recipe "postgresql::client"
 include_recipe "postgresql::server"
 
-# Create the OpenERP database user
-#bash "create_openerp_db_user" do
-#  user "postgres"
-#  code <<-EOH
-#  psql -c "CREATE ROLE #{node[:openerp][:user]} ENCRYPTED PASSWORD '#{node[:openerp][:password]}' SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN;"
-#  EOH
-#end
-
-#ruby "create_openerp_db_user" do
-#  user "postgres"
-#  code <<-EOH
-#require 'rubygems'
-#require 'pg'
-#conn = PGconn.connect(nil, 5432, nil, nil, nil, nil, nil)
-#conn.exec("CREATE ROLE #{node[:openerp][:user]} ENCRYPTED PASSWORD '#{node[:openerp][:password]}' SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN;")
-#conn.finish
-#  EOH
-#end
-
+# Create the OpenERP database role
 postgresql_role "openerp" do
-  host "127.0.0.1"
-  port 5432
   role "openerp"
   action :create
+  superuser true
+  createdb true
+  createrole true
+  inherit true
+  login true
 end
