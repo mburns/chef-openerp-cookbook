@@ -31,6 +31,14 @@
   end
 end
 
+user "openerp" do
+  comment "OpenERP System User"
+  system true
+  shell "/bin/false"
+  home "/opt/openerp"
+  manage_home true
+end
+
 remote_file "openerp-server" do
   path "#{Chef::Config['file_cache_path']}/openerp-server.tar.gz"
   source "http://www.openerp.com/download/stable/source/openerp-server-#{node[:openerp][:version]}.tar.gz"
@@ -38,10 +46,15 @@ remote_file "openerp-server" do
 end
 
 bash "untar-openerp-server" do
-  code "(cd /tmp; tar zxvf #{Chef::Config['file_cache_path']}/openerp-server.tar.gz)"
+  code <<-EOH
+  tar zxvf #{Chef::Config['file_cache_path']}/openerp-server.tar.gz -C /opt/openerp
+  chown -R openerp: /opt/openerp/openerp-server-#{node[:openerp][:version]}
+  EOH
+  not_if do File.exist?("/opt/openerp/openerp-server-#{node[:openerp][:version]}") &&
+    File.directory?("/opt/openerp/openerp-server-#{node[:openerp][:version]}")
+  end
 end
 
-execute "install-openerp-server" do
-  cwd "/tmp/openerp-server-#{node[:openerp][:version]}"
-  command "python setup.py install"
+link "/opt/openerp/openerp-server" do
+  to "openerp-server-#{node[:openerp][:version]}"
 end
