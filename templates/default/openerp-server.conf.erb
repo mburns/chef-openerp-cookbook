@@ -1,0 +1,64 @@
+[options]
+; This is the password that allows database operations
+; Will be written to by the server when password is changed
+; !! Keep this file secure !!
+; admin_passwd = admin
+
+root_path = /opt/openerp/server/bin
+
+without_demo = False
+verbose = False
+
+; Database settings
+db_user = <%=node[:openerp][:user]%>
+db_password = <%=node[:openerp][:password]%>
+; Please uncomment the following line *after* you have created the
+; database. It activates the auto module check on startup.
+; db_name = False
+db_port = False
+db_host = False
+db_maxconn = 64
+
+; Networking Settings
+xmlrpc = True
+xmlrpc_interface =
+xmlrpc_port = 8069
+
+netrpc = True
+netrpc_interface = 
+netrpc_port = 8070
+
+; Uncomment these for xml-rpc over SSL
+;xmlrpcs = True
+;xmlrpcs_interface =
+;xmlrpcs_port = 8071
+;secure_pkey_file = /etc/ssl/openerp/server.pkey
+;secure_cert_file = /etc/ssl/openerp/server.crt
+
+; Log settings
+logfile = /var/log/openerp/openerp-server.log
+syslog = False
+logrotate = True
+log_level = info
+
+; False prevents the client displaying the list of databases
+list_db = True
+addons_path = /opt/openerp/server/bin/addons
+demo = {}
+soap = False
+reportgz = False
+translate_modules = ['all']
+
+; Static http parameters
+static_http_enable = False
+static_http_document_root = /var/www/html
+static_http_url_prefix = /
+
+; Outbound email configuration
+;smtp_user = info@example.com
+;email_from = "OpenERP Support" <info@example.com>
+;smtp_port = 25
+;smtp_password = ********
+;smtp_ssl = True
+;smtp_server = mail.example.com
+

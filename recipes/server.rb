@@ -31,7 +31,7 @@
   end
 end
 
-user "openerp" do
+user "#{node[:openerp][:user]}" do
   comment "OpenERP System User"
   system true
   shell "/bin/false"
@@ -40,14 +40,14 @@ user "openerp" do
 end
 
 remote_file "openerp-server" do
-  path "#{Chef::Config['file_cache_path']}/openerp-server.tar.gz"
+  path "#{Chef::Config['file_cache_path']}/openerp-server-#{node[:openerp][:version]}.tar.gz"
   source "http://www.openerp.com/download/stable/source/openerp-server-#{node[:openerp][:version]}.tar.gz"
   mode "0644"
 end
 
 bash "untar-openerp-server" do
   code <<-EOH
-  tar zxvf #{Chef::Config['file_cache_path']}/openerp-server.tar.gz -C /opt/openerp
+  tar zxvf #{Chef::Config['file_cache_path']}/openerp-server-#{node[:openerp][:version]}.tar.gz -C /opt/openerp
   chown -R openerp: /opt/openerp/openerp-server-#{node[:openerp][:version]}
   EOH
   not_if do File.exist?("/opt/openerp/openerp-server-#{node[:openerp][:version]}") &&
@@ -55,6 +55,30 @@ bash "untar-openerp-server" do
   end
 end
 
-link "/opt/openerp/openerp-server" do
+link "/opt/openerp/server" do
   to "openerp-server-#{node[:openerp][:version]}"
+end
+
+directory "/var/log/openerp" do
+  owner "#{node[:openerp][:user]}"
+  group "root"
+end
+
+template "/etc/openerp-server.conf" do
+  source "openerp-server.conf.erb"
+  owner "#{node[:openerp][:user]}"
+  group "root"
+  mode "0640"
+  notifies :restart, "service[openerp-server]", :delayed
+end
+
+template "/etc/init.d/openerp-server" do
+  source "openerp-server.sh.erb"
+  mode "0755"
+  notifies :restart, "service[openerp-server]", :delayed
+end
+
+service "openerp-server" do
+  action :enable
+  supports :start => true, :stop => true, :restart => true
 end
