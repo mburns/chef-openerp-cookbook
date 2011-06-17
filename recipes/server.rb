@@ -17,26 +17,15 @@
 # limitations under the License.
 #
 
-#e = execute "apt-get update" do
-#  action :nothing
-#end
-#e.run_action(:run)
+include_recipe "openerp::common"
 
 # Packages needed for the core OpenERP Server
-%w{ python python-setuptools python-lxml python-mako python-egenix-mxdatetime python-dateutil
+%w{ python-lxml python-mako python-egenix-mxdatetime python-dateutil
     python-psycopg2 python-pychart python-pydot python-tz python-reportlab python-yaml
     python-vobject }.each do |pkg|
   package pkg do
     action :install
   end
-end
-
-user "#{node[:openerp][:user]}" do
-  comment "OpenERP System User"
-  system true
-  shell "/bin/false"
-  home "/opt/openerp"
-  manage_home true
 end
 
 remote_file "openerp-server" do
@@ -57,11 +46,6 @@ end
 
 link "/opt/openerp/server" do
   to "openerp-server-#{node[:openerp][:version]}"
-end
-
-directory "/var/log/openerp" do
-  owner "#{node[:openerp][:user]}"
-  group "root"
 end
 
 template "/etc/openerp-server.conf" do

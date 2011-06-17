@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: openerp
-# Recipe:: default
+# Recipe:: common
 #
 # Copyright 2011, Atriso BVBA
 #
@@ -17,6 +17,29 @@
 # limitations under the License.
 #
 
-include_recipe "openerp::database"
-include_recipe "openerp::server"
-include_recipe "openerp::webclient"
+###
+# Resources common to the core OpenERP server and webclient
+###
+
+# Common packages
+# Packages needed for the core OpenERP Server
+%w{ python python-setuptools }.each do |pkg|
+  package pkg do
+    action :install
+  end
+end
+
+# Common user
+user "#{node[:openerp][:user]}" do
+  comment "OpenERP System User"
+  system true
+  shell "/bin/false"
+  home "/opt/openerp"
+  manage_home true
+end
+
+# Common paths
+directory "/var/log/openerp" do
+  owner "#{node[:openerp][:user]}"
+  group "root"
+end
