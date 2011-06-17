@@ -2,12 +2,20 @@
 
 Installs and configures OpenERP server, web-client and database.
 
+= STATUS:
+
+Although the rest of the document indicates that this cookbook can install OpenERP in
+a distributed setup, the current version only supports installing everything on the same machine.
+
 = REQUIREMENTS:
 
 == Platform:
 
 Tested on the following platforms:
 - Ubuntu 10.04.1.
+
+Tested with the following OpenERP versions:
+- 6.0.0
 
 Open for patches to support more systems out of the box! Clone the repo, implement your changes and
 submit a pull request. The upstream repo lives here:
