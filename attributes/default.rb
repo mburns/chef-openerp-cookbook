@@ -19,7 +19,8 @@
 
 ::Chef::Node::Attribute.send(:include, Opscode::OpenSSL::Password)
 
-default[:openerp][:version] = "6.0.0"
+default[:openerp][:version] = "6.1-1"
 default[:openerp][:single_node] = "True"
 default[:openerp][:user] = "openerp"
 default[:openerp][:password] = secure_password
+default[:openerp][:location] = "/opt/openerp"
