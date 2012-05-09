@@ -11,7 +11,7 @@ module OpenERP
 
     def openerp_addons_path
       if openerp_short_version < 6.1
-        "#{openerp_server_path}/bin/openerp/addons"
+        "#{openerp_server_path}/bin/addons"
       else
         "#{openerp_server_path}/openerp/addons"
       end

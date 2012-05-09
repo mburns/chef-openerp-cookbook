@@ -33,7 +33,10 @@ module OpenERP
   end
 end
 
-::Chef::Recipe.send(:include, ::OpenERP::NameHelper)
-::Chef::Resource::RemoteFile.send(:include, ::OpenERP::NameHelper)
-::Chef::Resource::Bash.send(:include, ::OpenERP::NameHelper)
-::Chef::Resource::Template.send(:include, ::OpenERP::NameHelper)
+[::Chef::Recipe, 
+ ::Chef::Resource::RemoteFile,
+ ::Chef::Resource::Bash,
+ ::Chef::Resource::Template,
+ ::Chef::Resource::Link
+].each {|mod| mod.send(:include, ::OpenERP::NameHelper) }
+

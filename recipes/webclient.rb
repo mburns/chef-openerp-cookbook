@@ -30,7 +30,7 @@ if openerp_short_version >= 6.1
 else
 
   # Packages needed for the OpenERP Web Client
-  %w{ build-essential python-beaker python-cherrypy3 python-formencode python-pybabel }.each do |pkg|
+  %w{ build-essential python-beaker python-cherrypy3 python-formencode python-pybabel python-simplejson }.each do |pkg|
     package pkg do
       action :install
     end
