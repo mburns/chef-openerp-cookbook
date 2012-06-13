@@ -63,9 +63,11 @@ template "/etc/openerp-server.conf" do
   owner "#{node[:openerp][:user]}"
   group "root"
   mode "0640"
+  root_path = "#{openerp_path}/server/#{openerp_short_version < 6.1 ? 'bin' : 'openerp'}"
   variables(
-            :root_path => "#{openerp_path}/server/#{openerp_short_version < 6.1 ? 'bin' : 'openerp'}"
-            )
+    :root_path => root_path,
+    :addons_path => (["#{root_path}/addons"] + Array(node[:openerp][:addons_path])).flatten.join(',')
+  )
   notifies :restart, "service[openerp-server]", :delayed
 end
 
