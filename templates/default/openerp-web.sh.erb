@@ -18,7 +18,7 @@ NAME="openerp-web"
 DESC="openerp-web"
 
 # Specify the user name (Default: openerp).
-USER=<%=node[:openerp][:user]%>
+USER=<%= node['openerp']['user'] %>
 
 # Specify an alternate config file (Default: /etc/openerp-web.conf).
 CONFIGFILE="/etc/openerp-web.conf"

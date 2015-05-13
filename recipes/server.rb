@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: openerp
-# Recipe:: default
+# Recipe:: server
 #
 # Copyright 2011, Atriso BVBA
 #
@@ -17,68 +17,66 @@
 # limitations under the License.
 #
 
-include_recipe "openerp::common"
+include_recipe 'openerp::common'
 
 # Packages needed for the core OpenERP Server
-%w{ python-lxml python-mako python-egenix-mxdatetime python-dateutil
-    python-psycopg2 python-pychart python-pydot python-tz python-reportlab python-yaml
-    python-vobject }.each do |pkg|
+%w(python-lxml python-mako python-egenix-mxdatetime python-dateutil
+   python-psycopg2 python-pychart python-pydot python-tz python-reportlab python-yaml
+   python-vobject).each do |pkg|
   package pkg do
     action :install
   end
 end
 
 if openerp_short_version >= 6.1
-  %w{ python-simplejson python-gdata python-webdav }.each do |pkg|
+  %w(python-simplejson python-gdata python-webdav).each do |pkg|
     package pkg do
       action :install
     end
   end
 end
 
-remote_file "openerp-server" do
+remote_file 'openerp-server' do
   action :create_if_missing
   path "#{Chef::Config['file_cache_path']}/#{openerp_server_tarball}"
   source openerp_server_tarball_url
-  mode "0644"
+  mode '0644'
 end
 
 pkg_dir = "#{openerp_unix_name}-#{openerp_version}"
-bash "untar-openerp-server" do
+bash 'untar-openerp-server' do
   code <<-EOH
-  tar zxvf #{Chef::Config['file_cache_path']}/#{openerp_server_tarball} -C #{openerp_path}
-  chown -R openerp: #{openerp_path}/#{pkg_dir}
+    tar zxvf #{Chef::Config['file_cache_path']}/#{openerp_server_tarball} -C #{openerp_path}
+    chown -R openerp: #{openerp_path}/#{pkg_dir}
   EOH
-  not_if do File.exist?("#{openerp_path}/#{pkg_dir}") &&
-      File.directory?("#{openerp_path}/#{pkg_dir}")
-  end
+  not_if { File.exist?("#{openerp_path}/#{pkg_dir}") }
 end
 
 link "#{openerp_path}/server" do
   to pkg_dir
 end
 
-template "/etc/openerp-server.conf" do
-  source "openerp-server.conf.erb"
-  owner "#{node[:openerp][:user]}"
-  group "root"
-  mode "0640"
+template '/etc/openerp-server.conf' do
+  source 'openerp-server.conf.erb'
+  owner node['openerp']['user']
+  group 'root'
+  mode '0640'
   root_path = "#{openerp_path}/server/#{openerp_short_version < 6.1 ? 'bin' : 'openerp'}"
   variables(
-    :root_path => root_path,
-    :addons_path => (["#{root_path}/addons"] + Array(node[:openerp][:addons_path])).flatten.join(',')
+    root_path: root_path,
+    addons_path: (["#{root_path}/addons"] + Array(node['openerp']['addons_path'])).flatten.join(',')
   )
-  notifies :restart, "service[openerp-server]", :delayed
+  notifies :restart, 'service[openerp-server]', :delayed
 end
 
-template "/etc/init.d/openerp-server" do
-  source "openerp-server.sh.erb"
-  mode "0755"
-  variables :daemon => "#{openerp_path}/server/#{openerp_short_version < 6.1 ? 'bin/openerp-server.py' : 'openerp-server'}"
-  notifies :restart, "service[openerp-server]", :delayed
+template '/etc/init.d/openerp-server' do
+  source 'openerp-server.sh.erb'
+  mode '0755'
+  variables daemon: "#{openerp_path}/server/#{openerp_short_version < 6.1 ? 'bin/openerp-server.py' : 'openerp-server'}"
+  notifies :restart, 'service[openerp-server]', :delayed
 end
 
-service "openerp-server" do
-  action :enable
-  supports :start => true, :stop => true, :restart => true
+service 'openerp-server' do
+  action [:enable, :start]
+  supports start: true, stop: true, restart: true
 end

@@ -17,19 +17,19 @@
 # limitations under the License.
 #
 
-e = execute "apt-get update" do
+e = execute 'apt-get update' do
   action :nothing
 end
 e.run_action(:run)
 
 # Install the PostgreSQL client & server
-include_recipe "postgresql::client"
-include_recipe "postgresql::server"
+include_recipe 'postgresql::client'
+include_recipe 'postgresql::server'
 
 # Create the OpenERP database role
-postgresql_role node[:openerp][:user] do
-  role node[:openerp][:user]
-  password node[:openerp][:password]
+postgresql_role node['openerp']['user'] do
+  role node['openerp']['user']
+  password node['openerp']['password']
   action :create
   superuser true
   createdb true
