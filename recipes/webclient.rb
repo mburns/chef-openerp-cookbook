@@ -19,47 +19,60 @@
 
 include_recipe "openerp::common"
 
-# Packages needed for the OpenERP Web Client
-%w{ build-essential python-beaker python-cherrypy3 python-formencode python-pybabel }.each do |pkg|
-  package pkg do
-    action :install
+# From 6.1 on the webclient is integrated in the server, but needs some extra
+# dependencies
+if openerp_short_version >= 6.1
+
+  %w(python-werkzeug python-babel python-openid).each do |pkg|
+    package(pkg) { action :install }
   end
-end
 
-remote_file "#{Chef::Config['file_cache_path']}/openerp-web-#{node[:openerp][:version]}.tar.gz" do
-  source "http://www.openerp.com/download/stable/source/openerp-web-#{node[:openerp][:version]}.tar.gz"
-  mode "0644"
-end
+else
 
-bash "untar-openerp-server" do
-  code <<-EOH
-  tar zxvf #{Chef::Config['file_cache_path']}/openerp-web-#{node[:openerp][:version]}.tar.gz -C /opt/openerp
-  chown -R openerp: /opt/openerp/openerp-web-#{node[:openerp][:version]}
+  # Packages needed for the OpenERP Web Client
+  %w{ build-essential python-beaker python-cherrypy3 python-formencode python-pybabel python-simplejson }.each do |pkg|
+    package pkg do
+      action :install
+    end
+  end
+  
+  remote_file "#{Chef::Config['file_cache_path']}/openerp-web-#{node[:openerp][:version]}.tar.gz" do
+    action :create_if_missing
+    source "http://www.openerp.com/download/stable/source/openerp-web-#{node[:openerp][:version]}.tar.gz"
+    mode "0644"
+  end
+
+  bash "untar-openerp-server" do
+    code <<-EOH
+  tar zxvf #{Chef::Config['file_cache_path']}/openerp-web-#{node[:openerp][:version]}.tar.gz -C #{openerp_path}
+  chown -R openerp: #{openerp_path}/openerp-web-#{node[:openerp][:version]}
   EOH
-  not_if do File.exist?("/opt/openerp/openerp-web-#{node[:openerp][:version]}") &&
-    File.directory?("/opt/openerp/openerp-web-#{node[:openerp][:version]}")
+    not_if do File.exist?("#{openerp_path}/openerp-web-#{node[:openerp][:version]}") &&
+        File.directory?("#{openerp_path}/openerp-web-#{node[:openerp][:version]}")
+    end
   end
-end
+  
+  link "#{openerp_path}/web" do
+    to "openerp-web-#{openerp_version}"
+  end
 
-link "/opt/openerp/web" do
-  to "openerp-web-#{node[:openerp][:version]}"
-end
+  template "/etc/openerp-web.conf" do
+    source "openerp-web.conf.erb"
+    owner "#{node[:openerp][:user]}"
+    group "root"
+    mode "0640"
+    notifies :restart, "service[openerp-web]", :delayed
+  end
+  
+  template "/etc/init.d/openerp-web" do
+    source "openerp-web.sh.erb"
+    mode "0755"
+    notifies :restart, "service[openerp-web]", :delayed
+  end
+  
+  service "openerp-web" do
+    action :enable
+    supports :start => true, :stop => true, :restart => true
+  end
 
-template "/etc/openerp-web.conf" do
-  source "openerp-web.conf.erb"
-  owner "#{node[:openerp][:user]}"
-  group "root"
-  mode "0640"
-  notifies :restart, "service[openerp-web]", :delayed
-end
-
-template "/etc/init.d/openerp-web" do
-  source "openerp-web.sh.erb"
-  mode "0755"
-  notifies :restart, "service[openerp-web]", :delayed
-end
-
-service "openerp-web" do
-  action :enable
-  supports :start => true, :stop => true, :restart => true
 end

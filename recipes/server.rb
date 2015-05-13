@@ -28,24 +28,34 @@ include_recipe "openerp::common"
   end
 end
 
-remote_file "openerp-server" do
-  path "#{Chef::Config['file_cache_path']}/openerp-server-#{node[:openerp][:version]}.tar.gz"
-  source "http://www.openerp.com/download/stable/source/openerp-server-#{node[:openerp][:version]}.tar.gz"
-  mode "0644"
-end
-
-bash "untar-openerp-server" do
-  code <<-EOH
-  tar zxvf #{Chef::Config['file_cache_path']}/openerp-server-#{node[:openerp][:version]}.tar.gz -C /opt/openerp
-  chown -R openerp: /opt/openerp/openerp-server-#{node[:openerp][:version]}
-  EOH
-  not_if do File.exist?("/opt/openerp/openerp-server-#{node[:openerp][:version]}") &&
-    File.directory?("/opt/openerp/openerp-server-#{node[:openerp][:version]}")
+if openerp_short_version >= 6.1
+  %w{ python-simplejson python-gdata python-webdav }.each do |pkg|
+    package pkg do
+      action :install
+    end
   end
 end
 
-link "/opt/openerp/server" do
-  to "openerp-server-#{node[:openerp][:version]}"
+remote_file "openerp-server" do
+  action :create_if_missing
+  path "#{Chef::Config['file_cache_path']}/#{openerp_server_tarball}"
+  source openerp_server_tarball_url
+  mode "0644"
+end
+
+pkg_dir = "#{openerp_unix_name}-#{openerp_version}"
+bash "untar-openerp-server" do
+  code <<-EOH
+  tar zxvf #{Chef::Config['file_cache_path']}/#{openerp_server_tarball} -C #{openerp_path}
+  chown -R openerp: #{openerp_path}/#{pkg_dir}
+  EOH
+  not_if do File.exist?("#{openerp_path}/#{pkg_dir}") &&
+      File.directory?("#{openerp_path}/#{pkg_dir}")
+  end
+end
+
+link "#{openerp_path}/server" do
+  to pkg_dir
 end
 
 template "/etc/openerp-server.conf" do
@@ -53,12 +63,18 @@ template "/etc/openerp-server.conf" do
   owner "#{node[:openerp][:user]}"
   group "root"
   mode "0640"
+  root_path = "#{openerp_path}/server/#{openerp_short_version < 6.1 ? 'bin' : 'openerp'}"
+  variables(
+    :root_path => root_path,
+    :addons_path => (["#{root_path}/addons"] + Array(node[:openerp][:addons_path])).flatten.join(',')
+  )
   notifies :restart, "service[openerp-server]", :delayed
 end
 
 template "/etc/init.d/openerp-server" do
   source "openerp-server.sh.erb"
   mode "0755"
+  variables :daemon => "#{openerp_path}/server/#{openerp_short_version < 6.1 ? 'bin/openerp-server.py' : 'openerp-server'}"
   notifies :restart, "service[openerp-server]", :delayed
 end
 

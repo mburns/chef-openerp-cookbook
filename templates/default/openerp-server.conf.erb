@@ -4,10 +4,10 @@
 ; !! Keep this file secure !!
 ; admin_passwd = admin
 
-root_path = /opt/openerp/server/bin
+; root_path = <%= @root_path %>
 
-without_demo = False
-verbose = False
+; without_demo = False
+; verbose = False
 
 ; Database settings
 db_user = <%=node[:openerp][:user]%>
@@ -20,13 +20,13 @@ db_host = False
 db_maxconn = 64
 
 ; Networking Settings
-xmlrpc = True
-xmlrpc_interface =
-xmlrpc_port = 8069
+; xmlrpc = True
+; xmlrpc_interface =
+; xmlrpc_port = 8069
 
-netrpc = True
-netrpc_interface = 
-netrpc_port = 8070
+; netrpc = True
+; netrpc_interface = 
+; netrpc_port = 8070
 
 ; Uncomment these for xml-rpc over SSL
 ;xmlrpcs = True
@@ -42,17 +42,17 @@ logrotate = True
 log_level = info
 
 ; False prevents the client displaying the list of databases
-list_db = True
-addons_path = /opt/openerp/server/bin/addons
-demo = {}
-soap = False
-reportgz = False
-translate_modules = ['all']
+; list_db = True
+addons_path = <%= @addons_path %>
+; demo = {}
+; soap = False
+; reportgz = False
+; translate_modules = ['all']
 
 ; Static http parameters
-static_http_enable = False
-static_http_document_root = /var/www/html
-static_http_url_prefix = /
+; static_http_enable = False
+; static_http_document_root = /var/www/html
+; static_http_url_prefix = /
 
 ; Outbound email configuration
 ;smtp_user = info@example.com

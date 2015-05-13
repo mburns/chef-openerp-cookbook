@@ -34,7 +34,7 @@ user "#{node[:openerp][:user]}" do
   comment "OpenERP System User"
   system true
   shell "/bin/false"
-  home "/opt/openerp"
+  home node[:openerp][:location]
   manage_home true
 end
 
