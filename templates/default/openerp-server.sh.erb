@@ -18,7 +18,7 @@ NAME=openerp-server
 DESC=openerp-server
 
 # Specify the user name (Default: openerp).
-USER=<%=node[:openerp][:user]%>
+USER=<%= node['openerp']['user'] %>
 
 # Specify an alternate config file (Default: /etc/openerp-server.conf).
 CONFIGFILE="/etc/openerp-server.conf"

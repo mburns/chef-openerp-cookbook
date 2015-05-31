@@ -10,8 +10,8 @@
 ; verbose = False
 
 ; Database settings
-db_user = <%=node[:openerp][:user]%>
-db_password = <%=node[:openerp][:password]%>
+db_user = <%= node['openerp']['user'] %>
+db_password = <%= node['openerp']['password'] %>
 ; Please uncomment the following line *after* you have created the
 ; database. It activates the auto module check on startup.
 ; db_name = False

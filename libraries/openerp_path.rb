@@ -1,12 +1,11 @@
 module OpenERP
   module PathHelper
-
     def openerp_path
-      node[:openerp][:location]
+      node['openerp']['homedir']
     end
 
     def openerp_server_path
-      "#{node[:openerp][:location]}/server"
+      "#{node['openerp']['homedir']}/server"
     end
 
     def openerp_addons_path
@@ -16,7 +15,6 @@ module OpenERP
         "#{openerp_server_path}/openerp/addons"
       end
     end
-    
   end
 end
 
