@@ -1,6 +1,8 @@
 # OpenERP Cookbook
 
 [![Build Status](https://travis-ci.org/mburns/chef-openerp-cookbook.svg)](https://travis-ci.org/mburns/chef-openerp-cookbook)
+[![Chef cookbook](https://img.shields.io/cookbook/v/openerp.svg)](https://supermarket.chef.io/cookbooks/openerp)
+
 
 ## DESCRIPTION:
 
